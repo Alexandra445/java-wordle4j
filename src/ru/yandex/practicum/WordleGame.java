@@ -72,8 +72,19 @@ public class WordleGame {
         return possibleWords.get(new Random().nextInt(possibleWords.size()));
     }
 
-    public boolean isGameOver() { return won || steps <= 0; }
-    public boolean isWon() { return won; }
-    public int getSteps() { return steps; }
-    public String getAnswer() { return answer; }
+    public String getAnswer() {
+        return answer;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public boolean isWon() {
+        return won;
+    }
+
+    public boolean isGameOver() {
+        return steps <= 0 || won;
+    }
 }
