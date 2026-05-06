@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.*;
 
 public class WordleGame {
     private final String answer;
     private final WordleDictionary dictionary;
     private List<String> possibleWords;
+    private final Set<String> usedHints = new HashSet<>();
     private int steps = 6;
     private boolean won = false;
     private final PrintWriter log;
@@ -23,11 +25,19 @@ public class WordleGame {
     }
 
     public String makeMove(String guess) throws WordleException {
-        if (guess.length() != 5) throw new WordleException("Нужно 5 букв!");
-        if (!dictionary.contains(guess)) throw new WordleException("Такого слова нет в словаре!");
+        if (!guess.matches("^[а-яА-ЯёЁ]+$")) {
+            throw new WordleException("Используйте только русские буквы!");
+        }
 
+        if (guess.length() != 5) {
+            throw new InvalidWordLengthException("Слово должно состоять ровно из 5 букв.");
+        }
+
+        if (!dictionary.contains(guess)) {
+            throw new WordNotFoundException("Слова '" + guess + "' нет в словаре!");
+        }
         steps--;
-        String feedback = compare(guess, answer);
+        String feedback = WordleDictionary.compare(guess, answer);
 
         if (feedback.equals("+++++")) {
             won = true;
@@ -68,8 +78,17 @@ public class WordleGame {
     }
 
     public String getHint() {
-        if (possibleWords.isEmpty()) return "Нет вариантов...";
-        return possibleWords.get(new Random().nextInt(possibleWords.size()));
+        List<String> unusedHints = possibleWords.stream()
+                .filter(w -> !usedHints.contains(w))
+                .collect(Collectors.toList());
+
+        if (unusedHints.isEmpty()) {
+            return "Варианты кончились!";
+        }
+
+        String hint = unusedHints.get(new Random().nextInt(unusedHints.size()));
+        usedHints.add(hint);
+        return hint;
     }
 
     public String getAnswer() {

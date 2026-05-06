@@ -15,6 +15,13 @@ public class Wordle {
 
         } catch (Exception e) {
             System.err.println("Ошибка при запуске! Подробности в файле wordle.log");
+            try (PrintWriter logWriter = new PrintWriter(new FileWriter("wordle.log", true))) {
+                logWriter.println("\n--- КРИТИЧЕСКАЯ ОШИБКА ---");
+                e.printStackTrace(logWriter);
+                logWriter.flush();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 
